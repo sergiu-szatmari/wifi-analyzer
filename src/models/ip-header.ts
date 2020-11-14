@@ -19,23 +19,24 @@ export class IPv4Header {
         const vhl = buf.readUInt8(0);
         this.version = vhl >>> 4;   // First 4 bits
         this.ihl = vhl & 0x0f;      // Last 4 bits
+
         if (this.ihl * 4 > buf.byteLength) throw new Error('Incomplete IP Header');
         buf = buf.slice(0, this.ihl * 4);
-        this.typeOfService = buf.readUInt8(1);
 
+        this.typeOfService = buf.readUInt8(1);
         this.totalLength = buf.readUInt16BE(2);
         this.identification = buf.readUInt16BE(4);
 
         const flagsFragment = buf.readUInt16BE(6);
-
         this.flags = flagsFragment >>> 13; // First 3 bits
         this.dfFlag = (this.flags & 0x02) > 0;
         this.mfFlag = (this.flags & 0x04) > 0;
         this.fragmentOffset = flagsFragment & 0x1fff;
-        this.ttl = buf.readUInt8(8);
 
+        this.ttl = buf.readUInt8(8);
         this.protocol = buf.readUInt8(9);
         this.checkSum = buf.readUInt16BE(10);
+
         this.srcIp = new IpAddress(buf.slice(12, 16));
         this.destIp = new IpAddress(buf.slice(16, 20));
 

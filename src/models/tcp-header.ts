@@ -1,25 +1,25 @@
 export class TcpHeader {
-    srcPort: number; // Source port - 2 bytes
-    destPort: number; // Destination port - 2 bytes
+    srcPort: number;        // Source port - 2 bytes
+    destPort: number;       // Destination port - 2 bytes
     sequenceNumber: number; // Sequence number - 4 bytes
-    ackNumber: number; // Acknowledgement number - 4 bytes
-    dataOffset: number; // Data offset, rsvd - 1 byte
-    flags: number; // Flags - 9 bits
+    ackNumber: number;      // Acknowledgement number - 4 bytes
+    dataOffset: number;     // Data offset - 1 byte
+    flags: number;          // Flags - 9 bits
     flag: {
-        NS?: boolean; // ECN-Nonce flag
-        CWR?: boolean; // Congestion window reduced flag
-        ECE?: boolean; // ECN-Echo flag
-        URG?: boolean; // Urgent pointer flag
-        ACK?: boolean; // Acknowledgement flag
-        PSH?: boolean; // Push function flag
-        RST?: boolean; // Reset connection flag
-        SYN?: boolean; // Synchronize sequence numbers flag
-        FIN?: boolean; // Last packet
+        NS?: boolean;       // ECN-Nonce flag
+        CWR?: boolean;      // Congestion window reduced flag
+        ECE?: boolean;      // ECN-Echo flag
+        URG?: boolean;      // Urgent pointer flag
+        ACK?: boolean;      // Acknowledgement flag
+        PSH?: boolean;      // Push function flag
+        RST?: boolean;      // Reset connection flag
+        SYN?: boolean;      // Synchronize sequence numbers flag
+        FIN?: boolean;      // Last packet
     }
-    windowSize: number; // Window size - 2 bytes
-    checkSum: number; // Checksum - 2 bytes
-    urgentPointer: number; // Urgent pointer - 2 bytes
-    options?: Buffer; // Options if dataOffset > 5
+    windowSize: number;     // Window size - 2 bytes
+    checkSum: number;       // Checksum - 2 bytes
+    urgentPointer: number;  // Urgent pointer - 2 bytes
+    options?: Buffer;       // Options if dataOffset > 5
 
     constructor(buf: Buffer) {
         this.flag = {};
@@ -37,14 +37,14 @@ export class TcpHeader {
 
         const flags = buf.readUInt8(13);
         this.flags = flags + ((this.flag.NS ? 1 : 0) << 8);
-        this.flag.CWR = (this.flags & 0x80) > 0;
-        this.flag.ECE = (this.flags & 0x40) > 0;
-        this.flag.URG = (this.flags & 0x20) > 0;
-        this.flag.ACK = (this.flags & 0x10) > 0;
-        this.flag.PSH = (this.flags & 0x08) > 0;
-        this.flag.RST = (this.flags & 0x04) > 0;
-        this.flag.SYN = (this.flags & 0x02) > 0;
-        this.flag.FIN = (this.flags & 0x01) > 0;
+        this.flag.CWR = (this.flags & 0b10000000) > 0;
+        this.flag.ECE = (this.flags & 0b01000000) > 0;
+        this.flag.URG = (this.flags & 0b00100000) > 0;
+        this.flag.ACK = (this.flags & 0b00010000) > 0;
+        this.flag.PSH = (this.flags & 0b00001000) > 0;
+        this.flag.RST = (this.flags & 0b00000100) > 0;
+        this.flag.SYN = (this.flags & 0b00000010) > 0;
+        this.flag.FIN = (this.flags & 0b00000001) > 0;
 
         this.windowSize = buf.readUInt16BE(14);
         this.checkSum = buf.readUInt16BE(16);
