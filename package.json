@@ -1,0 +1,25 @@
+{
+  "name": "wifi-analyzer",
+  "version": "1.0.0",
+  "description": "Wi-fi analyzer/sniffer app",
+  "main": "src/app.ts",
+  "scripts": {
+    "build": "rm -rf build/ && tsc",
+    "start": "npm run build && node ./build/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sergiu",
+  "license": "ISC",
+  "dependencies": {
+    "cli-color": "^2.0.0",
+    "config": "^3.3.2",
+    "pcap": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/cli-color": "^2.0.0",
+    "@types/config": "0.0.36",
+    "@types/node": "^14.14.7",
+    "tsc-watch": "^4.2.9",
+    "typescript": "^4.0.5"
+  }
+}
