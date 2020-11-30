@@ -1,11 +1,11 @@
-import { MacAddress } from "./ip-header";
+import { MacAddress } from "./address";
 
 export enum EtherType {
-    IPv4 = 0x0800,
-    IFv6 = 0x86dd,
-    ARP = 0x0806,
-    RARP = 0x8035,
-    LOOPBACK = 0x9000
+    IPv4        = 0x0800,
+    IFv6        = 0x86DD,
+    ARP         = 0x0806,
+    RARP        = 0x8035,
+    LOOPBACK    = 0x9000
 }
 
 export class EthernetHeader {
@@ -17,8 +17,8 @@ export class EthernetHeader {
 
     constructor(buf: Buffer) {
         this.destMac = new MacAddress(buf.slice(0, 6));
-        this.srcMac = new MacAddress(buf.slice(6, 12));
-        this.type = buf.readUInt16BE(12);
+        this.srcMac  = new MacAddress(buf.slice(6, 12));
+        this.type    = buf.readUInt16BE(12);
     }
 
     get length(): number { return EthernetHeader.ETHERNET_HEADER_LENGTH; }

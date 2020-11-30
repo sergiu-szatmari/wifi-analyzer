@@ -1,6 +1,6 @@
 const UTC_EPOCH = Date.UTC(1970, 0, 1);
 
-export class Timeval {
+export class Ts {
     tvSec: number; // 4 bytes
     tvUsec: number;
 
@@ -23,7 +23,7 @@ export class PacketHeader {
     len: number;    // Length of this packet - 4 bytes
 
     constructor(buf: Buffer) {
-        this.timestamp = new Timeval(buf.slice(0, 8));
+        this.timestamp = new Ts(buf.slice(0, 8));
         this.caplen = buf.readUInt32LE(8);
         this.len = buf.readUInt32LE(12);
     }
