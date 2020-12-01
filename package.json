@@ -5,7 +5,6 @@
   "main": "src/app.ts",
   "scripts": {
     "build": "rm -rf build/ && tsc && clear",
-
     "sniffer": "npm run build && node ./build/app.js sniffer wlo1",
     "analyzer": "npm run build && node ./build/app.js analyzer wlo1mon"
   },
