@@ -2,11 +2,11 @@
   "name": "wifi-analyzer",
   "version": "1.0.0",
   "description": "Wi-fi analyzer/sniffer app",
-  "main": "src/app.ts",
+  "main": "src/main.ts",
   "scripts": {
     "build": "rm -rf build/ && tsc && clear",
-    "sniffer": "npm run build && node ./build/app.js sniffer wlo1",
-    "analyzer": "npm run build && node ./build/app.js analyzer wlo1mon"
+    "sniffer": "npm run build && node ./build/main.js sniffer wlo1",
+    "analyzer": "npm run build && node ./build/main.js analyzer wlo1mon"
   },
   "author": "Sergiu",
   "license": "ISC",
