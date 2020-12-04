@@ -64,7 +64,7 @@ export class RadioTapHeader {
         let presentFields = buf.readUInt32LE(4);
         let offset = 8;
         this.present = presentFields;
-        while (presentFields >>> 31 > 0) {
+        while (((presentFields >>> 31) & 1) > 0) {
             presentFields = buf.readUInt32LE(offset);
             offset += 4;
         }
@@ -78,7 +78,7 @@ export class RadioTapHeader {
             }
 
             // Check if field is present
-            if ((this.present & (2 ** currentFlag)) === 0) continue;
+            if (((this.present >>> currentFlag) & 1) === 0) continue;
 
             switch (currentFlag) {
                 case 3:

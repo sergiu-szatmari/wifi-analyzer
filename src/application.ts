@@ -1,7 +1,6 @@
 import { Constants } from "./constants";
 import pcap, { PacketWithHeader, PcapSession } from "pcap";
-import { changeWifiChannel, sessionConfig } from "./utils/app-utils";
-import { green } from "cli-color";
+import { green, yellow } from "cli-color";
 import { exec } from "child_process";
 import { PacketHeader } from "./models/packet-header";
 import { BeaconPacket } from "./models/beacon-packet";
@@ -15,24 +14,20 @@ export class App {
         if (![ 'sniffer', 'analyzer' ].includes(appType)) throw new Error('Invalid app type. (appType = "sniffer" | "analyzer")');
 
         // Setting the device name (if other than default)
-        Constants.device = device;
-
+        Constants.device                = device;
 
         const { promiscuous, filter }   = this.config();
         this.session                    = pcap.createSession(device, { promiscuous, filter });
-        const linkType                  = this.session.link_type;
+    }
 
+    public run() {
         if (this.appType === Constants.appType.analyzer) {
             this.wifis = { };
             this.initWifiChannelChange();
         }
 
         console.log(`Listening on ${ green((this.session as any).device_name) }`);
-        console.log(`Link type: ${ linkType }`);
-        // session.on('packet', this.onPacketHandler);
-    }
-
-    public run() {
+        console.log(`Link type: ${ this.session.link_type }`);
         this.session.on('packet', this.onPacketHandler);
     }
 
@@ -77,7 +72,7 @@ export class App {
 
             try {
                 const channel = await this.changeWifiChannel(channels[i]);
-                console.log(`Successfully changed channel to ${ green(channel) }`);
+                // console.log(`Successfully changed channel to ${ green(channel) }`);
                 i++;
             } catch (err) {
                 console.error(err);
@@ -85,9 +80,13 @@ export class App {
         }, Constants.wifiChannelChangeInterval);
     }
 
-
     private onPacketHandler = (rawPacket: PacketWithHeader) => {
         const header = new PacketHeader(rawPacket.header);
+
+        if (header.caplen !== header.len) {
+            console.log(yellow('Captured length !== length -- skipping . . .'));
+            return;
+        }
 
         try {
             let packet;
@@ -117,7 +116,7 @@ export class App {
                     break;
             }
         } catch (err) {
-            console.error(err);
+            // console.error(err);
         }
     }
 }
