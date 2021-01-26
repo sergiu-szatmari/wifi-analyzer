@@ -1,0 +1,189 @@
+:root {
+  font-family: "Libre Baskerville", serif;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Tmp */
+.sizing-box {
+  height: 50px;
+  width: 80px;
+}
+
+.signal-bars {
+  display: inline-block;
+}
+
+.signal-bars .bar {
+  width: 14%;
+  margin-left: 1%;
+  min-height: 20%;
+  display: inline-block;
+}
+
+.signal-bars .bar.first-bar {
+  height: 20%;
+}
+
+.signal-bars .bar.second-bar {
+  height: 40%;
+}
+
+.signal-bars .bar.third-bar {
+  height: 60%;
+}
+
+.signal-bars .bar.fourth-bar {
+  height: 80%;
+}
+
+.signal-bars .bar.fifth-bar {
+  height: 99%;
+}
+
+.best .bar {
+  background-color: #1bb32a;
+  border: thin solid #169423;
+}
+
+.good .bar {
+  background-color: #16a085;
+  border: thin solid #12816b;
+}
+
+.bad .bar {
+  background-color: #e74c3c;
+  border: thin solid #a82315;
+}
+
+.ok .bar {
+  background-color: #f1c40f;
+  border: thin solid #d0a90c;
+}
+
+.four-bars .bar.fifth-bar,
+.three-bars .bar.fifth-bar,
+.three-bars .bar.fourth-bar,
+.one-bar .bar:not(.first-bar),
+.two-bars .bar:not(.first-bar):not(.second-bar) {
+  background-color: #fafafa;
+  border: thin solid #f3f3f3;
+}
+
+/* --- Tmp --- */
+app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  min-width: 50vw;
+  max-width: 50vw;
+}
+app .wifi-network {
+  background-color: #e5e5e5;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+  margin: 1.125rem auto;
+}
+app .wifi-network .header {
+  padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+app .wifi-network .header .name {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+app .wifi-network .header .signal .sizing-box {
+  height: 50px;
+  width: 80px;
+}
+app .wifi-network .header .signal .signal-bars {
+  display: inline-block;
+}
+app .wifi-network .header .signal .signal-bars .bar {
+  width: 14%;
+  margin-left: 1%;
+  min-height: 20%;
+  display: inline-block;
+}
+app .wifi-network .header .signal .signal-bars .bar.first-bar {
+  height: 20%;
+}
+app .wifi-network .header .signal .signal-bars .bar.second-bar {
+  height: 40%;
+}
+app .wifi-network .header .signal .signal-bars .bar.third-bar {
+  height: 60%;
+}
+app .wifi-network .header .signal .signal-bars .bar.fourth-bar {
+  height: 80%;
+}
+app .wifi-network .header .signal .signal-bars .bar.fifth-bar {
+  height: 99%;
+}
+app .wifi-network .header .signal .best .bar {
+  background-color: #1bb32a;
+  border: thin solid #169423;
+}
+app .wifi-network .header .signal .good .bar {
+  background-color: #16a085;
+  border: thin solid #12816b;
+}
+app .wifi-network .header .signal .bad .bar {
+  background-color: #e74c3c;
+  border: thin solid #a82315;
+}
+app .wifi-network .header .signal .ok .bar {
+  background-color: #f1c40f;
+  border: thin solid #d0a90c;
+}
+app .wifi-network .header .signal .four-bars .bar.fifth-bar,
+app .wifi-network .header .signal .three-bars .bar.fifth-bar,
+app .wifi-network .header .signal .three-bars .bar.fourth-bar,
+app .wifi-network .header .signal .one-bar .bar:not(.first-bar),
+app .wifi-network .header .signal .two-bars .bar:not(.first-bar):not(.second-bar) {
+  background-color: transparent;
+}
+app .wifi-network .subheader {
+  background-color: #d5d2d2;
+  padding: 1rem;
+}
+app .wifi-network .subheader .line {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+app .wifi-network .content {
+  background-color: #cdcdcd;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+app .wifi-network .content .security {
+  margin-top: 0.5rem;
+}
+app .wifi-network .content .security:first-child {
+  margin-top: 0;
+}
+app .wifi-network .content .security .cipher {
+  margin: 0.75rem 0.5rem;
+}
+app .wifi-network .content .security .cipher .cipher-title {
+  font-style: italic;
+}
+app .wifi-network .content .security .cipher .cipher-list {
+  margin-left: 1rem;
+  list-style: none;
+}

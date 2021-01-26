@@ -10,7 +10,7 @@ export class MacHeader {
     bssid: MacAddress;      // 6 bytes
     seqCtl: number;         // 2 bytes
 
-    constructor(public buf: Buffer) {
+    constructor(buf: Buffer) {
         this.frameControl   = buf.readUInt16BE(0);
         this.duration       = buf.readUInt16BE(2);
         this.destMac        = new MacAddress(buf.slice(4, 10));
@@ -19,17 +19,27 @@ export class MacHeader {
         this.seqCtl         = buf.readUInt16BE(22);
     }
 
-    get length(): number {
-        return MacHeader.MAC_HEADER_LENGTH;
-    }
+    get length(): number { return MacHeader.MAC_HEADER_LENGTH; }
 
     toString() {
-        return `MAC Header ==========================
+        return `---- MAC Header ------------------------------
   * Frame control   : ${ this.frameControl }
   * Duration        : ${ this.duration }
   * Destination MAC : ${ this.destMac.toString() }
   * Source MAC      : ${ this.srcMac.toString() }
   * BSSID           : ${ this.bssid.toString() }
-  * Seq-ctl         : ${ this.seqCtl }`;
+  * Seq-ctl         : ${ this.seqCtl }
+----------------------------------------------------`;
+    }
+
+    toObject() {
+        return {
+            frameControl: this.frameControl,
+            duration: this.duration,
+            destMac: this.destMac.toString(),
+            srcMac: this.srcMac.toString(),
+            bssid: this.bssid.toString(),
+            seqCtl: this.seqCtl,
+        }
     }
 }

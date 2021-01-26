@@ -1,13 +1,16 @@
-import { Constants } from "./constants";
-import pcap, { PacketWithHeader, PcapSession } from "pcap";
-import { green, yellow } from "cli-color";
-import { exec } from "child_process";
-import { PacketHeader } from "./models/packet-header";
-import { BeaconPacket } from "./models/beacon-packet";
-import { TcpPacket } from "./models/tcp-packet";
+import WebSocket from 'ws';
+import pcap, { PacketWithHeader, PcapSession } from 'pcap';
+import { green, yellow } from 'cli-color';
+import { exec } from 'child_process';
+import { Constants } from './constants';
+import { PacketHeader } from './models/packet-header';
+import { BeaconPacket } from './models/beacon-packet';
+import { TcpPacket } from './models/tcp-packet';
+import { createWebSocket } from './sockets/socket';
 
 export class App {
     private session: PcapSession;
+    private socket?: WebSocket;
     wifis?: { [key: string]: BeaconPacket };
 
     constructor(private appType: string, device: string = Constants.device) {
@@ -15,15 +18,19 @@ export class App {
 
         // Setting the device name (if other than default)
         Constants.device                = device;
-
         const { promiscuous, filter }   = this.config();
         this.session                    = pcap.createSession(device, { promiscuous, filter });
+
+        createWebSocket().then(ws => {
+            this.socket = ws;
+            console.log(`The client has ${ green('connected') }`);
+        });
     }
 
     public run() {
         if (this.appType === Constants.appType.analyzer) {
             this.wifis = { };
-            this.initWifiChannelChange();
+            setTimeout(this.initWifiChannelChange, 2000);
         }
 
         console.log(`Listening on ${ green((this.session as any).device_name) }`);
@@ -52,6 +59,7 @@ export class App {
 
     private changeWifiChannel = async (channel: number): Promise<number> => {
         return new Promise((onResolve, onError) => {
+            // TODO: Remove this, use the one in utils
             exec(`iwconfig ${ Constants.device } channel ${ channel }`, (error, stdout, stderr) => {
                 if (error || stderr) onError(`Cannot change channel to ${ channel }`);
                 else onResolve(channel);
@@ -65,14 +73,11 @@ export class App {
         let i = 0;
         setInterval(async () => {
             // Reset to channel 1
-            if (i === channels.length) {
-                i = 0;
-                // this.wifis = { };
-            }
+            if (i === channels.length) i = 0;
 
             try {
                 const channel = await this.changeWifiChannel(channels[i]);
-                // console.log(`Successfully changed channel to ${ green(channel) }`);
+                console.log(`Successfully changed channel to ${ green(channel) }`);
                 i++;
             } catch (err) {
                 console.error(err);
@@ -91,17 +96,15 @@ export class App {
         try {
             let packet;
             switch (this.appType) {
+
                 case Constants.appType.analyzer:
                     packet = new BeaconPacket(rawPacket.buf);
-                    const { ssid } = packet.body;
 
-                    if (!Object.keys(this.wifis!).includes(ssid)) {
-                        this.wifis![ ssid ] = packet;
-                        // console.log(packet.radioTapHeader.toString());
-                        // console.log(packet.macHeader.toString());
-                        console.log(packet.body.toString());
-                        console.log()
-                    }
+                    this.socket?.send(JSON.stringify(packet.toObject(), null, 2));
+
+                    console.log(packet.toObject());
+                    console.log(packet.body.toString());
+                    console.log()
                     break;
 
                 case Constants.appType.sniffer:

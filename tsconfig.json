@@ -11,7 +11,7 @@
 
     "inlineSources": true,
     "sourceMap": true,
-
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "@types",
       "./node_modules/@types"

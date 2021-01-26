@@ -112,24 +112,25 @@ export class TcpHeader {
     get length(): number { return this.dataOffset * 4; }
 
     toString() {
-        return `TCP Header ==========================
-  * Source port      : ${this.srcPort}
-  * Destination port : ${this.destPort}
-  * Sequence number  : ${this.sequenceNumber}
-  * ACK number       : ${this.ackNumber}
-  * Data offset      : ${this.dataOffset}
-  * Flags            : ${this.flags}
-    - NS             : ${this.flag.NS}
-    - CWR            : ${this.flag.CWR}
-    - ECE            : ${this.flag.ECE}
-    - URG            : ${this.flag.URG}
-    - ACK            : ${this.flag.ACK}
-    - PSH            : ${this.flag.PSH}
-    - RST            : ${this.flag.RST}
-    - SYN            : ${this.flag.SYN}
-    - FIN            : ${this.flag.FIN}
-  * Window size      : ${this.windowSize}
-  * Checksum         : ${this.checkSum}
-  * Urgent pointer   : ${this.urgentPointer}`;
+        return `---- TCP Header ------------------------------
+  * Source port         : ${ this.srcPort }
+  * Destination port    : ${ this.destPort }
+  * Sequence number     : ${ this.sequenceNumber }
+  * ACK number          : ${ this.ackNumber }
+  * Data offset         : ${ this.dataOffset }
+  * Flags               : ${ this.flags }
+        --> NS          : ${ this.flag.NS }
+        --> CWR         : ${ this.flag.CWR }
+        --> ECE         : ${ this.flag.ECE }
+        --> URG         : ${ this.flag.URG }
+        --> ACK         : ${ this.flag.ACK }
+        --> PSH         : ${ this.flag.PSH }
+        --> RST         : ${ this.flag.RST }
+        --> SYN         : ${ this.flag.SYN }
+        --> FIN         : ${ this.flag.FIN }
+  * Window size         : ${ this.windowSize }
+  * Checksum            : ${ this.checkSum }
+  * Urgent pointer      : ${ this.urgentPointer }
+----------------------------------------------------`;
     }
 }

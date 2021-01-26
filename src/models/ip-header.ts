@@ -62,8 +62,8 @@ export class IPv4Header {
 
     constructor(buf: Buffer) {
         const vhl       = buf.readUInt8(0);
-        this.version    = vhl >>> 4;   // First 4 bits
-        this.ihl        = vhl & 0x0f;  // Last 4 bits
+        this.version    = vhl >>> 4;   // X X X X _ _ _ _
+        this.ihl        = vhl & 0x0f;  // _ _ _ _ X X X X
 
         if (this.ihl * 4 > buf.byteLength) throw new Error('Incomplete IP Header');
         buf = buf.slice(0, this.ihl * 4);
@@ -82,8 +82,8 @@ export class IPv4Header {
         this.protocol       = buf.readUInt8(9);
         this.checkSum       = buf.readUInt16BE(10);
 
-        this.srcIp = new IpAddress(buf.slice(12, 16));
-        this.destIp = new IpAddress(buf.slice(16, 20));
+        this.srcIp          = new IpAddress(buf.slice(12, 16));
+        this.destIp         = new IpAddress(buf.slice(16, 20));
 
         if (this.ihl > 5) this.options = buf.slice(20, this.ihl * 4);
     }
@@ -91,27 +91,26 @@ export class IPv4Header {
     get length(): number { return this.ihl * 4; }
 
     toString() {
-        return `IPv4 Header ==========================
-    * Version             : ${ this.version }
-    * IHL                 : ${ this.ihl }
-    * TOS                 : ${ this.typeOfService }
-    * Total length        : ${ this.totalLength }
-    * Identification      : ${ this.identification }
-    * Flags               : ${ this.flags }
-        * DF              : ${ this.flag.DF }
-        * MF              : ${ this.flag.MF }
-    * Fragment Offset     : ${ this.fragmentOffset }
-    * TTL                 : ${ this.ttl }
-    * Protocol            : ${ this.protocol }
-    * Checksum            : ${ this.checkSum }
-    * Source address      : ${ this.srcIp.toString() }
-    * Destination address : ${ this.destIp.toString() }`;
+        return `---- IPv4 Header ------------------------------
+  * Version             : ${ this.version }
+  * IHL                 : ${ this.ihl }
+  * TOS                 : ${ this.typeOfService }
+  * Total length        : ${ this.totalLength }
+  * Identification      : ${ this.identification }
+  * Flags               : ${ this.flags }
+        --> DF          : ${ this.flag.DF }
+        --> MF          : ${ this.flag.MF }
+  * Fragment Offset     : ${ this.fragmentOffset }
+  * TTL                 : ${ this.ttl }
+  * Protocol            : ${ this.protocol }
+  * Checksum            : ${ this.checkSum }
+  * Source address      : ${ this.srcIp.toString() }
+  * Destination address : ${ this.destIp.toString() }
+----------------------------------------------------`;
     }
 
 }
 
-
-// https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 export enum IpProtocol {
     HOPOPT          = 0,                BBNRCCMON       = 10,               HMP         = 20,
     ICMP            = 1,                NVPII           = 11,               PRM         = 21,

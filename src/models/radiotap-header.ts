@@ -57,21 +57,24 @@ export class RadioTapHeader {
 
 
     constructor(buf: Buffer) {
-        this.version    = buf.readUInt8();
-        this.pad        = buf.readUInt8(1);
-        this.len        = buf.readUInt16LE(2);
+        this.version        = buf.readUInt8();
+        this.pad            = buf.readUInt8(1);
+        this.len            = buf.readUInt16LE(2);
 
-        let presentFields = buf.readUInt32LE(4);
-        let offset = 8;
-        this.present = presentFields;
+        let presentFields   = buf.readUInt32LE(4);
+        let offset          = 8;    // First RadioTap present field offset
+                                    // (after version, pad, len, presentFields
+        this.present        = presentFields;
+
         while (((presentFields >>> 31) & 1) > 0) {
+            // If the 31st bit is set, then more ("presentFields" * words) follow
             presentFields = buf.readUInt32LE(offset);
             offset += 4;
         }
 
         const toParseFields = Object.keys(radioTapFields).length;
         for (let currentFlag = 0; currentFlag < toParseFields; currentFlag++) {
-            const field = radioTapFields[currentFlag];
+            const field = radioTapFields[ currentFlag ];
             if (offset % field.align !== 0) {
                 // Move offset to correct alignment position
                 offset += field.align - (offset % field.align);
@@ -101,7 +104,7 @@ export class RadioTapHeader {
 
                 case 5:
                     // Antenna Signal
-                    this.antennaSignal = buf.readUInt8(offset);
+                    this.antennaSignal = buf.readInt8(offset);
                     break;
             }
 
@@ -114,22 +117,34 @@ export class RadioTapHeader {
     }
 
     toString() {
-        return `Radiotap Header ==========================
-  * Version               : ${ this.version }
-  * Pad                   : ${ this.pad };
-  * Length                : ${ this.len };
-  * Present               : ${ this.present.toString(2) }
+        return `---- RadioTap Header ------------------------------
+  * Version                     : ${ this.version }
+  * Pad                         : ${ this.pad };
+  * Length                      : ${ this.len };
+  * Present                     : ${ this.present.toString(2) }
   * Channel
-    * Frequency           : ${ ((this.channel?.frequency ?? 0) / 1000)?.toFixed(3) } GHz
+    * Frequency                 : ${ ((this.channel?.frequency ?? 0) / 1000)?.toFixed(3) } GHz
     * Flags
-      * Turbo             : ${ this.channel?.flags?.turbo }
-      * CCK               : ${ this.channel?.flags?.CCK }
-      * ODFM              : ${ this.channel?.flags?.OFDM }
-      * 2 Ghz             : ${ this.channel?.flags?.TwoGhz }
-      * 5 Ghz             : ${ this.channel?.flags?.FiveGhz }
-      * Only passive scan : ${ this.channel?.flags?.passiveScan }
-      * Dynamic CCK-OFDM  : ${ this.channel?.flags?.dynamic }
-      * GFSK              : ${ this.channel?.flags?.GFSK }
-  * Antenna signal        : ${ this.antennaSignal }`;
+        --> Turbo               : ${ this.channel?.flags?.turbo }
+        --> CCK                 : ${ this.channel?.flags?.CCK }
+        --> OFDM                : ${ this.channel?.flags?.OFDM }
+        --> 2 Ghz               : ${ this.channel?.flags?.TwoGhz }
+        --> 5 Ghz               : ${ this.channel?.flags?.FiveGhz }
+        --> Only passive scan   : ${ this.channel?.flags?.passiveScan }
+        --> Dynamic CCK-OFDM    : ${ this.channel?.flags?.dynamic }
+        --> GFSK                : ${ this.channel?.flags?.GFSK }
+  * Antenna signal              : ${ this.antennaSignal }
+----------------------------------------------------`;
+    }
+
+    toObject() {
+        return {
+            version: this.version,
+            pad: this.pad,
+            len: this.len,
+            present: this.present,
+            channel: this.channel,
+            antennaSignal: this.antennaSignal
+        }
     }
 }

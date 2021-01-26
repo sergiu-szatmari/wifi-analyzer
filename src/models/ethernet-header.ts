@@ -2,7 +2,7 @@ import { MacAddress } from "./address";
 
 export enum EtherType {
     IPv4        = 0x0800,
-    IFv6        = 0x86DD,
+    IPv6        = 0x86DD,
     ARP         = 0x0806,
     RARP        = 0x8035,
     LOOPBACK    = 0x9000
@@ -24,9 +24,10 @@ export class EthernetHeader {
     get length(): number { return EthernetHeader.ETHERNET_HEADER_LENGTH; }
 
     toString() {
-        return `Ethernet Header ==========================
-  * Destination MAC : ${this.destMac.toString()}
-  * Source MAC      : ${this.srcMac.toString()}
-  * Type            : ${EtherType[this.type]}`;
+        return `---- Ethernet Header ------------------------------
+  * Destination MAC : ${ this.destMac.toString() }
+  * Source MAC      : ${ this.srcMac.toString() }
+  * EtherType       : ${ EtherType[ this.type ] }
+----------------------------------------------------`;
     }
 }

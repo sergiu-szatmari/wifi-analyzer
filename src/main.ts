@@ -5,5 +5,4 @@ const mode = process.argv[2] || Constants.appType.sniffer;
 
 if (process.argv[3]) Constants.device = process.argv[3];
 
-const app = new App(mode);
-app.run();
+new App(mode).run();

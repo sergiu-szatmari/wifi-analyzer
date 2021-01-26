@@ -1,6 +1,7 @@
 import { MacHeader } from "./mac-header";
 import { RadioTapHeader } from "./radiotap-header";
 import { OUI } from "./address";
+import { toObject, toString } from '../utils/object-utils';
 
 export class BeaconPacket {
     radioTapHeader: RadioTapHeader;
@@ -9,8 +10,16 @@ export class BeaconPacket {
 
     constructor(buf: Buffer) {
         this.radioTapHeader = new RadioTapHeader(buf.slice(0));
-        this.macHeader = new MacHeader(buf.slice(this.radioTapHeader.length, this.radioTapHeader.length + MacHeader.MAC_HEADER_LENGTH));
-        this.body = new BeaconBody(buf.slice(this.radioTapHeader.length + this.macHeader.length));
+        this.macHeader      = new MacHeader(buf.slice(this.radioTapHeader.length, this.radioTapHeader.length + MacHeader.MAC_HEADER_LENGTH));
+        this.body           = new BeaconBody(buf.slice(this.radioTapHeader.length + this.macHeader.length));
+    }
+
+    toObject() {
+        return {
+            radioTapHeader: this.radioTapHeader.toObject(),
+            macHeader: this.macHeader.toObject(),
+            body: this.body.toObject(),
+        }
     }
 }
 
@@ -33,7 +42,7 @@ interface CipherSuite {
     suiteType: number;
 }
 
-interface SecurityInformation {
+export interface SecurityInformation {
     version: number;
     groupCipherSuite: CipherSuite;
     pairwiseCipherSuites: CipherSuite[];
@@ -52,12 +61,16 @@ export class BeaconBody {
     // Requested or advertised optional capabilities - 2 bytes
     capabilityInfo: number;
 
-    // variable
+    // Wi-fi name
     ssid: string;
 
-    // ...
+    // Current channel number
     currentChannel?: number;
+
+    // Robust Secure Network
     rsn?: SecurityInformation;
+
+
     wpa?: SecurityInformation;
     vendorSpecificOUIs?: OUI[];
 
@@ -73,11 +86,9 @@ export class BeaconBody {
         this.ssid           = buf.slice(14, 14 + ssidLength).toString('ascii');
 
         let offset = 14 + ssidLength;
-        // while (offset + 1 < buf.byteLength) {
         while (offset < buf.byteLength) {
             const elementId     = buf.readUInt8(offset);
             const elementLength = buf.readUInt8(offset + 1);
-            // if (!elementLength) return;
 
             const element       = buf.slice(offset + 2, offset + 2 + elementLength);
 
@@ -132,34 +143,10 @@ export class BeaconBody {
                             return { cipherSuites, rsnOffset };
                         };
 
-                        // const pairwiseCipherSuites: CipherSuite[] = [];
-                        // const pairwiseCipherCount = element.readUInt16LE(rsnOffset);
-                        // rsnOffset += 2;
-                        //
-                        // for (let cipherIdx = 0; cipherIdx < pairwiseCipherCount; cipherIdx++) {
-                        //     const cipher: CipherSuite = {
-                        //         oui: new OUI(element.slice(rsnOffset, rsnOffset + 3)),
-                        //         suiteType: element.readUInt8(rsnOffset + 3)
-                        //     };
-                        //     pairwiseCipherSuites.push(cipher);
-                        //     rsnOffset += 4;
-                        // }
                         let result = getCipherSuites(rsnOffset, element);
                         const pairwiseCipherSuites: CipherSuite[] = result.cipherSuites;
                         rsnOffset = result.rsnOffset;
 
-                        // const authenticationCipherSuites: CipherSuite[] = [];
-                        // const authCipherCount = element.readUInt16LE(rsnOffset);
-                        // rsnOffset += 2;
-                        //
-                        // for (let cipherIdx = 0; cipherIdx < authCipherCount; cipherIdx++) {
-                        //     const cipher: CipherSuite = {
-                        //         oui: new OUI(element.slice(rsnOffset, rsnOffset + 3)),
-                        //         suiteType: element.readUInt8(rsnOffset + 3)
-                        //     };
-                        //     authenticationCipherSuites.push(cipher);
-                        //     rsnOffset += 4;
-                        // }
                         result = getCipherSuites(rsnOffset, element);
                         const authenticationCipherSuites: CipherSuite[] = result.cipherSuites;
                         rsnOffset = result.rsnOffset;
@@ -193,7 +180,7 @@ export class BeaconBody {
     }
 
     toString() {
-        let str = `Beacon body ==========================
+        let str = `---- Beacon Body ------------------------------
   * Timestamp       : ${ this.timestamp } us 
   * Beacon Interval : ${ this.beaconInterval }
   * SSID            : ${ this.ssid }
@@ -203,47 +190,33 @@ export class BeaconBody {
   * Vendors`;
             this.vendorSpecificOUIs.forEach((vendor) => {
                 str += `
-    * ${ vendor.toString() }`;
+        --> ${ vendor.toString() }`;
             });
         }
         if (this.rsn) {
             str += `
   * RSN
-${ securityInformationToString(this.rsn) }`;
+${ toString(this.rsn) }`;
         }
         if (this.wpa) {
             str += `
   * WPA
-${ securityInformationToString(this.wpa) }`;
+${ toString(this.wpa) }
+----------------------------------------------------`;
         }
         return str;
     }
+
+    toObject() {
+        return {
+            timestamp: this.timestamp.toString(),
+            beaconInterval: this.beaconInterval,
+            capabilityInfo: this.capabilityInfo,
+            ssid: this.ssid,
+            currentChannel: this.currentChannel,
+            rsn: this.rsn ? toObject(this.rsn) : undefined,
+            wpa: this.wpa ? toObject(this.wpa) : undefined,
+            vendorSpecificOUIs: this.vendorSpecificOUIs?.map(oui => oui.toString())
+        }
+    }
 }
-
-const enumKey = (enumName: 'GroupCipherSuiteType' | 'AuthenticationCipherSuiteType', value: number): string => {
-    const e = enumName === 'GroupCipherSuiteType' ? GroupCipherSuiteType : AuthenticationCipherSuiteType;
-    return Object.keys(e)[Object.values(e).indexOf(value)];
-}
-
-const securityInformationToString = (securityInfo: SecurityInformation) => {
-    let str = '';
-    str += `    * Version : ${ securityInfo.version }
-  * Group cipher suite
-    * OUI  : ${ securityInfo.groupCipherSuite.oui.toString() }
-    * Type : ${ enumKey('GroupCipherSuiteType', securityInfo.groupCipherSuite.suiteType) }`;
-
-    securityInfo.pairwiseCipherSuites.forEach((pairwiseCipherSuite) => {
-        str += `
-  * Pairwise cipher suite
-    * OUI  : ${ pairwiseCipherSuite.oui.toString() }
-    * Type : ${ pairwiseCipherSuite.suiteType }`;
-    });
-
-    securityInfo.authenticationCipherSuites.forEach((authCipherSuite) => {
-        str += `
-  * AKM cipher suite
-    * OUI  : ${ authCipherSuite.oui.toString() }
-    * Type : ${ enumKey('AuthenticationCipherSuiteType', authCipherSuite.suiteType) }`;
-    });
-    return str;
-};
