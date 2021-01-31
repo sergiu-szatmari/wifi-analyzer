@@ -1,5 +1,5 @@
 # Wi-Fi Analyzer & Packet Sniffer
-Wi-fi analyzer/sniffer app created with Node.js.
+Ubuntu-based wi-fi analyzer/sniffer app created with Node.js.
 
 ## Usage
 
@@ -18,7 +18,7 @@ npm run analyzer
 ```
 The client might fail to run if Google Chrome is not installed, but it can be opened manually from **_client/index.html_**
 
-Run `sudo ./start-managed-mode.sh` to 
+Run `sudo ./start-managed-mode.sh` to get back to managed mode.
 
 ### References
 #### TCP Packet:
